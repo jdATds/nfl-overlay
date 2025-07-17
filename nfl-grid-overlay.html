@@ -48,18 +48,42 @@
 <body>
   <div class="grid" id="grid"></div>
 
-  <script>
-    const sheetURL = "https://opensheet.elk.sh/1KQrM7T6YI2OCoLCpgNmYRFZmsgQEXeIjGZxtIw1bfJo/Teams";
+ <script>
+  const sheetURL = "https://api.allorigins.win/get?url=" + encodeURIComponent("https://opensheet.elk.sh/1KQrM7T6YI2OCoLCpgNmYRFZmsgQEXeIjGZxtIw1bfJo/Teams");
 
-    async function fetchSheetData() {
-      try {
-        const res = await fetch(sheetURL);
-        const data = await res.json();
-        renderGrid(data);
-      } catch (err) {
-        console.error("Failed to fetch sheet data:", err);
-      }
+  async function fetchSheetData() {
+    try {
+      const response = await fetch(sheetURL);
+      const raw = await response.json();
+      const data = JSON.parse(raw.contents);
+      renderGrid(data);
+    } catch (err) {
+      console.error("Failed to fetch sheet data:", err);
     }
+  }
 
-    function renderGrid(data) {
-      const grid = doc
+  function renderGrid(data) {
+    const grid = document.getElementById("grid");
+    grid.innerHTML = "";
+
+    data.forEach(row => {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+
+      const team = document.createElement("div");
+      team.className = "team";
+      team.textContent = row.Team;
+
+      const buyer = document.createElement("div");
+      buyer.className = "buyer";
+      buyer.textContent = row.Buyer || "";
+
+      cell.appendChild(team);
+      cell.appendChild(buyer);
+      grid.appendChild(cell);
+    });
+  }
+
+  fetchSheetData();
+  setInterval(fetchSheetData, 5000);
+</script>
